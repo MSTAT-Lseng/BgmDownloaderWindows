@@ -854,10 +854,21 @@ img {
   overflow: hidden;
 }
 
+/*
+ * 搜索中的遮罩必须固定在视口内，不能跟随内容滚动。
+ *
+ * 它挂在 .page 里，而滚动发生在祖先 .app__content 上：
+ * position: absolute 会让遮罩跟着内容一起被卷走，内容越高越明显。
+ * 改用 fixed 并让遮罩只覆盖页面区域（顶部让出窗口标题栏与顶栏、
+ * 底部让出标签栏），同时把背景压到接近不透明，避免下方结果透出来。
+ */
 .loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 7, 12, 0.7);
+  position: fixed;
+  top: calc(var(--titlebar-height) + var(--header-height));
+  right: 0;
+  bottom: var(--tabbar-height);
+  left: 0;
+  background: rgba(5, 7, 12, 0.92);
   display: flex;
   flex-direction: column;
   align-items: center;

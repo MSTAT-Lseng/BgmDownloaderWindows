@@ -23,6 +23,63 @@ export function SearchScreen({ q }: SearchScreenProps) {
   // 每次搜索自增，用于丢弃过期请求的结果
   const runIdRef = useRef(0)
 
+  /**
+   * 搜索中锁定滚动。
+   *
+   * 结果是一个个站点陆续返回的，列表会越来越长；若不锁定，
+   * 用户能在「正在搜索...」遮罩下滚到一个仍在变化的高度。
+   *
+   * 仅设 overflow: hidden 并不够（脚本赋值和部分输入仍能移动 scrollTop），
+   * 这里同时接管 wheel / touchmove / 翻页键，并在搜索期间始终把 scrollTop 钉在 0。
+   */
+  useEffect(() => {
+    if (!loading) return
+    const scroller = document.querySelector<HTMLElement>('.app__content')
+    if (!scroller) return
+
+    const prevOverflow = scroller.style.overflowY
+
+    scroller.scrollTop = 0
+    scroller.style.overflowY = 'hidden'
+
+    // 内容高度变化（新结果插入）时也可能触发滚动锚定，这里持续钉住
+    const pinToTop = () => {
+      if (scroller.scrollTop !== 0) scroller.scrollTop = 0
+    }
+    const onWheel = (e: Event) => {
+      e.preventDefault()
+      pinToTop()
+    }
+    const onTouchMove = (e: Event) => e.preventDefault()
+    const onKeyDown = (e: KeyboardEvent) => {
+      // PageUp / PageDown / 空格 / 方向键 / Home / End 都会引起滚动
+      const keys = ['PageUp', 'PageDown', ' ', 'ArrowUp', 'ArrowDown', 'Home', 'End']
+      if (keys.includes(e.key) && !(e.target instanceof HTMLInputElement)) {
+        e.preventDefault()
+        pinToTop()
+      }
+    }
+
+    scroller.addEventListener('wheel', onWheel, { passive: false })
+    scroller.addEventListener('touchmove', onTouchMove, { passive: false })
+    // 兜底：任何绕过上面手势拦截的滚动（脚本赋值、滚动锚定等）都会立刻被拉回顶部
+    scroller.addEventListener('scroll', pinToTop, true)
+    window.addEventListener('keydown', onKeyDown, true)
+    const observer = new MutationObserver(pinToTop)
+    observer.observe(scroller, { childList: true, subtree: true })
+
+    return () => {
+      scroller.removeEventListener('wheel', onWheel)
+      scroller.removeEventListener('touchmove', onTouchMove)
+      scroller.removeEventListener('scroll', pinToTop, true)
+      window.removeEventListener('keydown', onKeyDown, true)
+      observer.disconnect()
+      scroller.style.overflowY = prevOverflow
+      // 不恢复旧的滚动位置：结果列表已在搜索期间重建，恢复会让人莫名停在列表中段
+      scroller.scrollTop = 0
+    }
+  }, [loading])
+
   const handleSearch = useCallback(
     async (keyword: string) => {
       const runId = ++runIdRef.current
