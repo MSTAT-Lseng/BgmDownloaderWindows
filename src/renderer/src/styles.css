@@ -65,6 +65,8 @@ button {
   color: inherit;
   background: none;
   border: none;
+  /* 重置浏览器给 button 的默认内边距（1px 6px），否则卡片封面等会左右缩进 */
+  padding: 0;
   cursor: pointer;
 }
 
