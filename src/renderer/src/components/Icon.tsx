@@ -8,7 +8,12 @@
 
 import type { CSSProperties } from 'react'
 
-/** Ionicons 常用图标的码点（来自 @expo/vector-icons 的 glyphmap） */
+/**
+ * Ionicons 常用图标的码点（取自 @expo/vector-icons 的 glyphmaps/Ionicons.json）。
+ *
+ * 注意：码点写错不会报错，只会渲染成另一个字形（例如 62485 是 logo-steam）。
+ * 增删条目时请对照官方 glyphmap 核对。
+ */
 const IONICONS = {
   'settings-outline': 62828,
   'chevron-back': 61993,
@@ -27,9 +32,9 @@ const IONICONS = {
   'mail-outline': 62516,
   'eye-off-outline': 62184,
   'eye-outline': 62186,
-  'search-outline': 62548,
-  'reload-outline': 62485,
-  'add-outline': 61647
+  'search-outline': 62819,
+  'reload-outline': 62750,
+  'add-outline': 61703
 } as const
 
 export type IoniconsName = keyof typeof IONICONS
