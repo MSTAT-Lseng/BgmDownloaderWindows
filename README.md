@@ -1,12 +1,11 @@
-# 番剧下载 · Windows 桌面版
+# BgmDownloaderWindows
 
-本项目是 [BgmDownloaderV5](../BgmDownloaderV5)（Expo / React Native 版本）的 **Electron 重写版**，
-面向 Windows 平台。功能与原 App 保持一致：Bangumi 放送日历、聚合搜索、站点赞列表、收藏，
-以及带页面净化的内嵌浏览器播放页。
+本项目是 [BgmDownloaderV5](https://github.com/MSTAT-Lseng/BgmDownloaderV5) 的 **Electron 版本**，
+面向 Windows 平台。功能与原 App 保持一致。
 
-## 功能对照
+## 功能
 
-| 原 App（Expo） | 桌面版（Electron） |
+| 移动端（Expo） | 桌面版（Electron） |
 | --- | --- |
 | `expo-router` 文件路由 | `src/renderer/src/navigation.tsx` 内的轻量导航栈 |
 | `react-native-webview` | `WebContentsView`（`src/main/webview-controller.ts`） |
