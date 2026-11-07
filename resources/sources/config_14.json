@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/search?q={q}",
+    "details_format": "{host}{result}",
+    "item_regex": "<article\\s+class=\"schedule-card\\s+search-result-card\"[\\s\\S]*?<a\\s+class=\"schedule-poster\"\\s+href=\"[^\"]+\"[\\s\\S]*?<img[^>]*?\\ssrc=\"([^\"]+)\"[^>]*>[\\s\\S]*?<a\\s+href=\"([^\"]+)\"[^>]*>\\s*<h2[^>]*>\\s*([^<]+?)\\s*<\\/h2>[\\s\\S]*?<\\/article>",
+    "fields": {
+      "url": {
+        "match_index": 2,
+        "description": "详情页跳转链接"
+      },
+      "image": {
+        "match_index": 1,
+        "description": "作品封面图片地址"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}

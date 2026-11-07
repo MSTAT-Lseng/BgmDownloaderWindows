@@ -1,0 +1,236 @@
+[
+  {
+    "id": 1,
+    "name": "次元城动画",
+    "url": "https://www.cycani.org",
+    "desc": "仅限国内IP使用",
+    "icon": "cycani",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 2,
+    "name": "打驴动漫",
+    "url": "https://www.sbdl.cc",
+    "desc": null,
+    "icon": "dalvdm",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 3,
+    "name": "Animoe动漫",
+    "url": "https://animoe.org",
+    "desc": null,
+    "icon": "animoe",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 4,
+    "name": "ANIME7",
+    "url": "https://anime7.top",
+    "desc": null,
+    "icon": "anime7",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 5,
+    "name": "囧次元",
+    "url": "https://www.cilicili.net",
+    "desc": null,
+    "icon": "jcydmz",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 6,
+    "name": "樱花动漫",
+    "url": "https://yinghuadm.cn",
+    "desc": null,
+    "icon": "yinghuadm",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 7,
+    "name": "风铃动漫",
+    "url": "https://www.aafun.cc",
+    "desc": "无广告，但有些资源需要注册登录。",
+    "icon": "aafun",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 8,
+    "name": "番薯动漫",
+    "url": "https://www.fsdm02.com",
+    "desc": "轻微广告，视频清晰。",
+    "icon": "fsdm02",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 9,
+    "name": "喵物次元",
+    "url": "https://www.mwcy.net",
+    "desc": "有广告",
+    "icon": "mwcy",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 10,
+    "name": "稀饭动漫",
+    "url": "https://next.xifanacg.com",
+    "desc": "有广告，视频清晰。",
+    "icon": "xifanacg",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 11,
+    "name": "动漫巴士",
+    "url": "https://dmbus.cc",
+    "desc": "有广告，视频高清。",
+    "icon": "dmbus",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 12,
+    "name": "girigiri爱动漫",
+    "url": "https://ani.girigirilove.com",
+    "desc": "少量广告，视频清晰。仅国内IP可用。",
+    "icon": "girigirilove",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 13,
+    "name": "clicli弹幕网",
+    "url": "https://clicli.cc",
+    "desc": "有广告，视频高清。",
+    "icon": "clicli",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 14,
+    "name": "咕咕番",
+    "url": "https://gugu.fan",
+    "desc": "有广告，视频清晰。",
+    "icon": "gugu3",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 15,
+    "name": "嘶哩嘶哩",
+    "url": "https://www.silisilifun.com",
+    "desc": "在网站内的搜索框中输入“silisilinb”等待页面跳转。",
+    "icon": "silisilifun",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 16,
+    "name": "MX动漫",
+    "url": "https://www.mxdm.xyz",
+    "desc": "有广告，视频高清。",
+    "icon": "mxdm",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 17,
+    "name": "橘子动漫",
+    "url": "https://www.jzacg.com",
+    "desc": "有广告，视频高清，需要注册登录。",
+    "icon": "jzacg",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 18,
+    "name": "去看吧动漫",
+    "url": "https://11kt.net",
+    "desc": "有广告，画质清晰。",
+    "icon": "11kt",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 19,
+    "name": "西瓜卡通",
+    "url": "https://cn.xgcartoon.com",
+    "desc": "有广告，需要手动在播放器中设置1080P画质，部分地区存在被拦截无法正常访问现象",
+    "icon": "xgcartoon",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 20,
+    "name": "XDM动漫",
+    "url": "https://xdmdm.com",
+    "desc": "有广告，如遇异常，尝试切换资源。有可能需要梯子。",
+    "icon": "xuandm",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 21,
+    "name": "樱花动漫2",
+    "url": "https://www.706dm.com",
+    "desc": "有广告，视频清晰。",
+    "icon": "706dm",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 22,
+    "name": "路漫漫动漫",
+    "url": "https://www.lmm58.com",
+    "desc": "视频高清，移动端有广告，视频中间部分可能存在博彩广告。",
+    "icon": "lmm58",
+    "enabled": false,
+    "adaptation": false
+  },
+  {
+    "id": 23,
+    "name": "五弹幕动漫",
+    "url": "https://www.5dm.dev",
+    "desc": "有广告，视频清晰，请勿登录，因为注册可能要收费，视频加载稍慢，请等待。",
+    "icon": "5dm",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 24,
+    "name": "AGE动漫",
+    "url": "https://www.agedm.io",
+    "desc": "经典动漫站点，有广告。仅限国内IP。",
+    "icon": "agedm",
+    "enabled": true,
+    "adaptation": true
+  },
+  {
+    "id": 25,
+    "name": "樱花动漫",
+    "url": "https://www.xdm6.com",
+    "desc": "有广告",
+    "icon": "xdm6",
+    "enabled": true,
+    "adaptation": false
+  },
+  {
+    "id": 26,
+    "name": "Anime1动漫",
+    "url": "https://anime1.me",
+    "desc": "有广告，画质中等",
+    "icon": "anime1",
+    "enabled": true,
+    "adaptation": false
+  }
+]

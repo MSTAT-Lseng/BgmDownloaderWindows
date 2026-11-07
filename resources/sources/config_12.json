@@ -1,0 +1,22 @@
+{
+  "search_config": {
+    "url": "https://m3u8.girigirilove.com/api.php/Vod/get_list?offset=0&limit=24&vod_weekday=&vod_letter=&vod_tag=&vod_name={q}&vod_blurb=&vod_area=&vod_year=&orderby=&vod_class=&vod_lang=&vod_version=&vod_state=&user_id=",
+    "details_format": "{host}/voddetail/{result}.html",
+    "cookie": "_ga=GA1.1.2115694592.1768352522; ds_notice=1; PHPSESSID=v486nrdipj88eifo0qnnkn62ba; _ga_B2C22CJL17=GS2.1.s1772587427$o7$g1$t1772587432$j55$l0$h0",
+    "item_regex": "\\{\"vod_id\":(\\d+),\"vod_pic\":\"([^\"]+)\",\"vod_name\":\"([^\"]+)\"[\\s\\S]*?\"follow_status\":\"[^\"]*\"\\}",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "用于拼接详情页链接的 vod_id"
+      },
+      "image": {
+        "match_index": 2,
+        "description": "作品封面图片地址"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}

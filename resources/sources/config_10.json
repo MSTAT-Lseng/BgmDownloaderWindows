@@ -1,0 +1,29 @@
+{
+  "search_config": {
+    "url": "https://api.xifanacg.com/rest/v1/rpc/search_animes",
+    "method": "POST",
+    "body": {
+      "search_term": "{q}",
+      "page_number": 1,
+      "items_per_page": 24,
+      "sort_by": "created_at",
+      "sort_order": "desc"
+    },
+    "details_format": "https://next.xifanacg.com/anime/{result}",
+    "item_regex": "\"id\":\\s*(\\d+)\\s*,\\s*\"title\":\\s*\"((?:[^\"\\\\]|\\\\.)*)\"[\\s\\S]*?\"cover_url\":\\s*(?:\"([^\"]*)\"|null)",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "详情页作品 ID"
+      },
+      "title": {
+        "match_index": 2,
+        "description": "作品标题名称"
+      },
+      "image": {
+        "match_index": 3,
+        "description": "作品封面图片地址"
+      }
+    }
+  }
+}

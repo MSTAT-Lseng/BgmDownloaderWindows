@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/search?query={q}",
+    "details_format": "{result}",
+    "item_regex": "<div class=\"card cata_video_item py-4\">[\\s\\S]*?href=\"(.*?)\"[\\s\\S]*?data-original=\"(.*?)\"[\\s\\S]*?card-title\"><a.*?>(.*?)</a>",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "详情页跳转链接"
+      },
+      "image": {
+        "match_index": 2,
+        "description": "作品封面图片地址"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}

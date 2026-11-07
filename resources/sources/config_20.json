@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/search?q={q}",
+    "details_format": "{host}/video/{result}",
+    "item_regex": "\\\\\"video\\\\\":\\{\\\\\"id\\\\\":(\\d+),\\\\\"type_id\\\\\":\\d+,\\\\\"title\\\\\":\\\\\"([^\\\\\"]*)\\\\\",\\\\\"cover\\\\\":\\\\\"([^\\\\\"]*)\\\\",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "详情页作品 ID"
+      },
+      "title": {
+        "match_index": 2,
+        "description": "作品标题名称"
+      },
+      "image": {
+        "match_index": 3,
+        "description": "作品封面图片地址"
+      }
+    }
+  }
+}

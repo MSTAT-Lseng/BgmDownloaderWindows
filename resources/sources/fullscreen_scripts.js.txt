@@ -1,0 +1,52 @@
+// 全屏监听脚本：把页面进入 / 退出全屏的事件回传给原生端，用于切换屏幕方向
+(function () {
+  /** 判断当前页面是否处于全屏（需兼容各浏览器前缀） */
+  function isFullscreen() {
+    return !!(document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement);
+  }
+
+  /** 把事件类型通过桥接发给原生端 */
+  function post(type) {
+    try {
+      window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
+        JSON.stringify({ type: type, fullscreen: isFullscreen() })
+      );
+    } catch (e) {}
+  }
+
+  // 标准与各前缀的 fullscreenchange 事件都监听一遍
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"].forEach(function (evt) {
+    document.addEventListener(evt, function () {
+      post(isFullscreen() ? "enter_fullscreen" : "exit_fullscreen");
+    }, true);
+  });
+
+  // 兼容 iOS 的 <video> 全屏事件（仅部分页面 / 系统版本触发）
+  document.addEventListener("webkitbeginfullscreen", function () {
+    post("enter_fullscreen");
+  }, true);
+
+  document.addEventListener("webkitendfullscreen", function () {
+    post("exit_fullscreen");
+  }, true);
+
+  // 播放 / 暂停只作为备用信息，并不代表进入或退出全屏
+  document.addEventListener("play", function (e) {
+    if (e && e.target && e.target.tagName === "VIDEO") post("video_play");
+  }, true);
+
+  document.addEventListener("pause", function (e) {
+    if (e && e.target && e.target.tagName === "VIDEO") post("video_pause");
+  }, true);
+
+  post("bridge_ready");
+})();
+
+// 通知原生端脚本已注入完毕
+window.ReactNativeWebView.postMessage('hello');
+
+// 注入脚本必须返回一个真值，否则 iOS 端不会执行
+true;

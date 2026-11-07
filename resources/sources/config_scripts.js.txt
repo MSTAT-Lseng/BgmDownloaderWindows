@@ -1,0 +1,398 @@
+// 页面净化脚本：按 URL 正则匹配对应站点的规则，隐藏广告 / 导航元素并覆盖部分样式
+try{
+/** 键是 URL 正则，值是该页面要隐藏的元素选择器和要覆盖的样式 */
+const regex_module = {
+
+    // 站点 1：次元城
+    // 搜索页
+    "www\\.cycani\\.org\\\/category": {
+        "hidden_elements": [
+            ".container.flex.h-14.items-center.gap-0",
+            ".mb-6",
+            "footer",
+            "a.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm"
+        ],
+        "custom_css": {
+          "main": {
+            "padding-top": "0"
+          },
+          "div.row-9": {
+            "padding-bottom": "25px"
+          }
+        }
+    },
+    // 详情页
+    "www\\.cycani\\.org\\\/anime\\\/": {
+      "hidden_elements": [
+        "div.container.flex.h-14.items-center.gap-0",
+        "a.inline-flex.items-center.justify-center.gap-2.whitespace-nowrap.text-sm",
+        "section.border-t.border-border.py-6",
+        "footer"
+      ],
+      "custom_css": {
+        ".vod-detail.style-detail.rel.cor1.hader0": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    // 播放页
+    "www\\.cyfz\\.vip\\\/vodplay\\\/": {
+      "hidden_elements": [
+        ".head.flex.between.head-c.header_nav0",
+        ".head.flex.between.head-c.header_nav0.head-b",
+        ".fun.flex.between.box.radius",
+        ".wap-diy-vod-a-box.tim-box"
+      ],
+    },
+
+    // 站点 4：anime7
+    // 搜索页
+    "anime7\\.top\\\/vod-search\\\/(?:\\?wd=|page\\\/)": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".hl-ctwrap-item.hl-conch-items.hl-search-items",
+        ".conch-ads-box.hl-this-box.hl-row-box.clearfix",
+        ".hl-rb-title.hl-site-tabs.hl-site-tits.hl-text-site",
+        ".conch-footwrap.hl-bg-subs.hl-footnav-show"
+      ],
+      "custom_css": {
+        ".conch-content.hl-row-box": {
+          "margin-bottom": "0"
+        },
+        "body": {
+          "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
+        }
+      }
+    },
+    // 详情页
+    "anime7\\.top\\\/vod-detail\\\/": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".conch-ads-box.hl-this-box.hl-row-box.clearfix",
+        ".hl-row-box.hl-rb-relvod.clearfix|0",
+        ".hl-row-box.hl-rb-relart.clearfix|0",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm"
+      ],
+      "custom_css": {
+        "body": {
+          "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
+        }
+      }
+    },
+    // 播放页
+    "anime7\\.top\\\/vod-play\\\/": {
+      "hidden_elements": [
+        ".adsbygoogle",
+        "#conch-header",
+        ".hl-setups-wrap-2",
+        "#ad1002",
+        "#ad1007",
+        ".hl-infos-content.clearfix",
+        ".hl-row-box.hl-rb-relvod.clearfix",
+        ".hl-row-box.hl-rb-relart.clearfix",
+        ".hl-row-box.hl-rb-comm.clearfix",
+        "#conch-footer",
+        ".hl-foot-nav.hl-bg-site.hl-hide-sm"
+      ],
+      "custom_css": {
+        ".hl-col-xs-12.hl-playinfo-wrap": {
+          "padding-top": "18px"
+        },
+        "body": {
+          "padding-top": "0"
+        },
+        "#google-anno-sa": {
+          "height": "0",
+          "box-shadow": "none"
+        }
+      }
+    },
+
+    // 站点 5：cilicili
+    "cilicili\\.net\\\/index\\.php\\\/vod\\\/search(\\.html\\?wd=|\\\/page\\\/)": {
+      "hidden_elements": [
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
+      ],
+      "custom_css": {
+        "div.main": {
+          "padding-top": "0"
+        }
+      }
+    },
+    "www\\.cilicili\\.net\\\/index\\.php\\\/vod\\\/detail\\/id": {
+      "hidden_elements": [
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
+      ]
+    },
+    "www\\.cilicili\\.net\\\/index\\.php\\\/vod\\\/play\\\/id": {
+      "hidden_elements": [
+        "div.sidebar",
+        "div.footer",
+        "div.footer-content"
+      ]
+    },
+
+    // 站点 10：稀饭动漫
+    "next\\.xifanacg\\.com": {
+      "custom_css": {
+        "body": {
+          "background": "#fff"
+        }
+      }
+    },
+    "next\\.xifanacg\\.com\\\/(search)": {
+      "hidden_elements": [
+        ".sticky.top-0.z-50.flex.h-14.items-center.gap-2.border-b",
+        "a.fixed.right-4",
+        "nav.fixed"
+      ]
+    },
+    "next\\.xifanacg\\.com\\\/anime\\\/": {
+      "hidden_elements": [
+        ".sticky.top-0.z-50.flex.h-14.items-center.gap-2.border-b",
+        "a.fixed.right-4",
+        "nav.fixed"
+      ]
+    },
+    "next\\.xifanacg\\.com\\\/anime\\\/[^/]+\\\/play\\\/[^/]+": {
+      "hidden_elements": [
+        ".sticky.top-0.z-50.flex.h-14.items-center.gap-2.border-b",
+        "a.fixed.right-4",
+        "nav.fixed",
+        "aside.grid.gap-3"
+      ]
+    },
+
+
+    // 站点 11：dmbus
+    "dmbus\\.cc\\\/s-": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    "dmbus\\.cc\\\/v\\\/": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav",
+        "li.more"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
+    },
+    "dmbus\\.cc\\\/p\\\/": {
+      "hidden_elements": [
+        "#mask",
+        ".notice_box",
+        ".header",
+        ".nav",
+        "li.more"
+      ],
+      "custom_css": {
+        ".container": {
+          "z-index": "9999999999",
+          "margin-bottom": "-150px"
+        },
+        ".card.mb20": {
+          "padding-top": "20px"
+        }
+      }
+    },
+
+    // 站点 12：girigirilove
+    "ani\\.girigirilove\\.com\\\/search": {
+      "hidden_elements": [
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "div.surface.p-5",
+        "nav"
+      ]
+    },
+    "ani\\.girigirilove\\.com\\\/detail": {
+      "hidden_elements": [
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "div.surface.p-5",
+        "nav"
+      ]
+    },
+    "ani\\.girigirilove\\.com\\\/play": {
+      "hidden_elements": [
+        "header",
+        "section.banner-ads.banner-ads-columns",
+        "section.banner-ads.banner-ads-compact",
+        "div.surface.p-5",
+        "nav"
+      ]
+    },
+
+    // 站点 14：gugu
+    "gugu\\.fan\\\/search": {
+      "hidden_elements": [
+        "header",
+        "section.catalog-query-card",
+        "footer"
+      ],
+      "custom_css": {
+        "main": {
+          "padding-top": "0"
+        }
+      }
+    },
+    "gugu\\.fan\\\/anime\\\/": {
+      "hidden_elements": [
+        "header",
+        "section.catalog-query-card",
+        "footer",
+        "div.detail-anchor-shell"
+      ],
+      "custom_css": {
+        "main": {
+          "padding-top": "0"
+        }
+      }
+    },
+
+    // 站点 19：西瓜卡通
+    "cn\\.xgcartoon\\.com\\\/search": {
+      "hidden_elements": [
+        "div.headers",
+        "div.footer"
+      ]
+    },
+    "cn\\.xgcartoon\\.com\\\/detail\\\/": {
+      "hidden_elements": [
+        "div.headers",
+        "div.footer",
+        "div.share"
+      ]
+    },
+    "xgct\\.com\\\/video\\\/": {
+      "hidden_elements": [
+        "div.headers",
+        "div.footer",
+        "div.addthis-box.row"
+      ]
+    },
+
+    // 站点 20：xdmdm
+    "xdmdm\\.com\\\/search": {
+      "hidden_elements": [
+        "header",
+        "form.flex.gap-2",
+        "footer"
+      ]
+    },
+    "xdmdm\\.com\\\/video": {
+      "hidden_elements": [
+        "header",
+        "footer",
+        "div.flex.flex-col.items-center.gap-3.mb-8"
+      ]
+    },
+    "xdmdm\\.com\\\/play\\\/": {
+      "hidden_elements": [
+        "header",
+        "footer"
+      ]
+    },
+
+    // 站点 24：agedm
+    "m\\.agedm\\.io": {
+      "hidden_elements": [
+        ".container.head-container",
+        ".van-hairline--top.van-tabbar.van-tabbar--fixed"
+      ]
+    }
+    
+}
+
+Object.keys(regex_module).forEach(pattern => {
+  const regex = new RegExp(pattern);
+    
+  // 只处理当前页面地址命中的规则
+  if (regex.test(window.location.href)) {
+
+    // 隐藏元素：选择器支持 "selector|下标"，即只隐藏匹配到的第 N 个元素
+    if (regex_module[pattern].hasOwnProperty('hidden_elements')) {
+      const hidden_elements = regex_module[pattern].hidden_elements;
+        
+      hidden_elements.forEach(selector => {
+        try {
+          if (selector.includes('|')) {
+            const [_selector, index] = selector.split('|');
+            const elements = document.querySelectorAll(_selector);
+            const targetIndex = parseInt(index);
+
+            if (elements[targetIndex]) {
+              elements[targetIndex].style.display = 'none';
+            }
+          } else {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+              el.style.display = 'none';
+            });
+          }
+        } catch (error) {
+          console.error(`无法处理选择器 "${selector}":`, error);
+        }
+      });
+    }
+      
+    // 覆盖样式：custom_css 是「选择器 → { 属性: 值 }」的两层结构，直接写到行内样式上
+    if (regex_module[pattern].hasOwnProperty('custom_css')) {
+      const custom_css = regex_module[pattern].custom_css;
+        
+      Object.keys(custom_css).forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+          Object.keys(custom_css[selector]).forEach(property => {
+            el.style[property] = custom_css[selector][property];
+          })
+        })
+      })
+    }
+      
+  }
+});
+
+} catch (error) {}
+
+// 通知原生端脚本已注入完毕
+window.ReactNativeWebView.postMessage('hello');
+
+// 注入脚本必须返回一个真值，否则 iOS 端不会执行
+true;

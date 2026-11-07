@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/search?q={q}",
+    "details_format": "{host}{result}",
+    "item_regex": "<a href=\"(/detail/[^\"]+)\"[^>]*class=\"topic-list-item\"[^>]*>[\\s\\S]*?<amp-img src=\"([^\"?]+)[^\"]*\"[\\s\\S]*?<div class=\"h3 mb12\"[^>]*>([\\s\\S]*?)</div>",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "详情页跳转链接"
+      },
+      "image": {
+        "match_index": 2,
+        "description": "作品封面图片地址"
+      },
+      "title": {
+        "match_index": 3,
+        "description": "作品标题名称"
+      }
+    }
+  }
+}

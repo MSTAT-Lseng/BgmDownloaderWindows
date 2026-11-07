@@ -1,0 +1,21 @@
+{
+  "search_config": {
+    "url": "{host}/vod-search/?wd={q}&submit=",
+    "details_format": "{host}{result}",
+    "item_regex": "<li class=\"[^\"]*hl-list-item[^\"]*\">[\\s\\S]*?<a[^>]*class=\"[^\"]*hl-item-thumb[^\"]*\"[^>]*href=\"([^\"]+)\"[^>]*title=\"([^\"]+)\"[^>]*data-original=\"([^\"]+)\"",
+    "fields": {
+      "url": {
+        "match_index": 1,
+        "description": "详情页跳转链接"
+      },
+      "title": {
+        "match_index": 2,
+        "description": "作品标题名称"
+      },
+      "image": {
+        "match_index": 3,
+        "description": "作品封面图片地址"
+      }
+    }
+  }
+}
