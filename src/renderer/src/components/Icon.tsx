@@ -106,3 +106,31 @@ export function SearchIcon({ size = 18, color = '#667085' }: { size?: number; co
     </svg>
   )
 }
+
+/** 刷新图标（lucide rotate-cw）；加载中时旋转，由外部传入 className 控制 */
+export function RefreshIcon({
+  size = 18,
+  color = '#EAF0FF',
+  className
+}: {
+  size?: number
+  color?: string
+  className?: string
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+      <path d="M21 3v6h-6" />
+    </svg>
+  )
+}

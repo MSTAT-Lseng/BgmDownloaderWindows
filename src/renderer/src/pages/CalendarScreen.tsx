@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigation } from '../navigation'
 import { decodeHtmlEntities } from '../utils/html'
-import { SearchIcon } from '../components/Icon'
+import { RefreshIcon, SearchIcon } from '../components/Icon'
 
 /** Bangumi 返回的星期信息 */
 interface CalendarWeekday {
@@ -189,11 +189,14 @@ export function CalendarScreen() {
           ) : null}
         </div>
 
-        <button className="btn" onClick={handleSearch} disabled={!query.trim()}>
-          聚合搜索
-        </button>
-        <button className="btn btn--ghost" onClick={onRefresh} disabled={refreshing || loading}>
-          {refreshing ? '刷新中…' : '刷新'}
+        <button
+          className="icon-btn icon-btn--surface"
+          onClick={() => void onRefresh()}
+          disabled={refreshing || loading}
+          title={refreshing ? '刷新中…' : '刷新日历'}
+          aria-label={refreshing ? '刷新中…' : '刷新日历'}
+        >
+          <RefreshIcon className={refreshing ? 'spin' : undefined} />
         </button>
       </div>
 

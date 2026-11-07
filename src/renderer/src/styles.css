@@ -427,6 +427,25 @@ img {
   background: rgba(255, 255, 255, 0.07);
 }
 
+/* 放在页面内容区（而非顶栏）的图标按钮：高度与搜索框对齐 */
+.icon-btn--surface {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.icon-btn--surface:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* 刷新中：图标匀速旋转 */
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
 /* ---------------- 首页日历 ---------------- */
 
 .calendar-toolbar {
