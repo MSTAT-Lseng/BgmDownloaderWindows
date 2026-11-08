@@ -5,7 +5,8 @@
  * 因此收藏命名改用应用内自绘弹窗，行为与原 App 的 Modal 一致。
  */
 
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { setDialogOpen } from './dialog-visibility'
 
 interface PromptContextValue {
   /** 弹出输入框；用户取消时 resolve(null) */
@@ -52,6 +53,12 @@ export function PromptProvider({ children }: { children: ReactNode }) {
     resolverRef.current = null
     setState(null)
   }, [])
+
+  // 弹窗出现时通知外层隐藏原生 WebContentsView，否则对话框会被它遮住
+  useEffect(() => {
+    setDialogOpen('prompt', !!state)
+    return () => setDialogOpen('prompt', false)
+  }, [state])
 
   return (
     <PromptContext.Provider value={{ prompt }}>

@@ -13,6 +13,7 @@ import type { OpenWebviewOptions, WebviewState } from '@shared/types'
 import { Icon } from '../components/Icon'
 import { useNavigation } from '../navigation'
 import { getApi } from '../services/bridge'
+import { subscribeDialogOpen } from '../services/dialog-visibility'
 import { usePrompt } from '../services/prompt'
 
 interface WebviewScreenProps {
@@ -140,9 +141,21 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
     }
   }, [syncBounds])
 
-  // 离开该页面时关闭原生视图（返回时由下一次 open 重新创建）
+  /**
+   * 弹窗与原生视图的联动。
+   *
+   * 原生 WebContentsView 是独立合成层，永远盖在渲染层之上；应用内对话框落在它的
+   * 区域里就会被挡住，只剩铺满全窗口的遮罩露在边缘（标题栏 / 标签栏变灰），
+   * 看起来就像「点了收藏没反应」。所以弹窗打开期间隐藏视图，关闭后恢复。
+   *
+   * 组件卸载（离开内置浏览器页）时把视图隐藏，等下次 open 再重新显示。
+   */
   useEffect(() => {
+    const unsubscribe = subscribeDialogOpen((anyOpen) => {
+      void getApi().webview.setVisible(!anyOpen)
+    })
     return () => {
+      unsubscribe()
       void getApi().webview.setVisible(false)
     }
   }, [])
@@ -153,7 +166,13 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
     back()
   }, [back])
 
-  /** 顶栏右侧按钮：sources 外部打开 / player 收藏切换 */
+  /**
+   * 顶栏右侧按钮：sources 外部打开 / player 收藏切换。
+   *
+   * 注意：弹窗必须在任何 await 之前弹出。
+   * 之前的实现先去 await 一次 IPC 同步收藏状态，一旦这次往返慢或抛错，
+   * 点击就完全没有反应（用户看到的就是「点一次没弹窗」）。
+   */
   const handleHeaderAction = useCallback(async () => {
     const api = getApi()
 
@@ -163,26 +182,30 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
       return
     }
 
-    // 以数据库为准确定当前是否已收藏，避免顶栏星标与实际状态不一致
-    const synced = await api.webview.syncFavorite()
-    if (synced) setState(synced)
-
-    if (synced?.favorite) {
-      // 已收藏 → 取消收藏
-      const next = await api.webview.setFavorite({ favorite: false })
-      if (next) setState(next)
+    // 已收藏 → 直接取消（这一步不需要弹窗，可以安全地先查状态）
+    if (state?.favorite) {
+      try {
+        const next = await api.webview.setFavorite({ favorite: false })
+        if (next) setState(next)
+      } catch (e) {
+        console.error('取消收藏失败:', e)
+      }
       return
     }
 
-    // 未收藏 → 先让用户命名，再落库
-    const defaultName = synced?.title || url
+    // 未收藏 → 立刻弹出命名框，命名后再落库
+    const defaultName = state?.title || url || '未命名收藏'
     const name = await prompt({ title: '添加收藏', defaultValue: defaultName, placeholder: '请输入名称' })
     if (name === null) return
     const trimmed = name.trim()
     if (!trimmed) return
 
-    const next = await api.webview.setFavorite({ favorite: true, name: trimmed })
-    if (next) setState(next)
+    try {
+      const next = await api.webview.setFavorite({ favorite: true, name: trimmed })
+      if (next) setState(next)
+    } catch (e) {
+      console.error('收藏失败:', e)
+    }
   }, [type, state, url, prompt])
 
   return (

@@ -5,7 +5,8 @@
  * 所以删除收藏等需要二次确认的操作统一用这里的弹窗。
  */
 
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { setDialogOpen } from './dialog-visibility'
 
 interface ConfirmOptions {
   title: string
@@ -37,6 +38,12 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     resolverRef.current = null
     setState(null)
   }, [])
+
+  // 同 prompt：弹窗出现时隐藏原生 WebContentsView
+  useEffect(() => {
+    setDialogOpen('confirm', !!state)
+    return () => setDialogOpen('confirm', false)
+  }, [state])
 
   return (
     <ConfirmContext.Provider value={{ confirm }}>

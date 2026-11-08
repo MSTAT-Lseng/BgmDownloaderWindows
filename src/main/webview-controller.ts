@@ -114,12 +114,16 @@ export class WebviewController {
     this.applyBounds()
   }
 
-  /** 显示 / 隐藏浏览器视图（离开网页页时隐藏，避免遮挡其他界面） */
+  /**
+   * 显示 / 隐藏浏览器视图。
+   *
+   * 隐藏用于两种情况：离开内置浏览器页，以及应用内弹窗打开时
+   * （原生视图浮在渲染层之上，会挡住对话框）。
+   */
   setVisible(visible: boolean) {
     this.visible = visible
     if (!this.view) return
     this.view.setVisible(visible)
-    if (visible && this.win) this.win.contentView.addChildView(this.view)
   }
 
   private applyBounds() {
