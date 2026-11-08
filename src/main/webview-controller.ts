@@ -9,6 +9,7 @@
  */
 
 import { BrowserWindow, WebContentsView, shell, type Rectangle } from 'electron'
+import { IPC } from '@shared/ipc'
 import type { WebviewState, ViewMode } from '@shared/types'
 import { favoritesDb } from './favorites-db'
 import { loadInjectedScript } from './resources'
@@ -70,7 +71,22 @@ export class WebviewController {
   private purifyScript = ''
   private purifyTimer: NodeJS.Timeout | null = null
 
-  constructor(private readonly emit: (channel: 'webview:state' | 'webview:close' | 'webview:toast', payload: unknown) => void) {}
+  /**
+   * 加载进度估算。
+   *
+   * Electron 的 WebContentsView 没有 onLoadProgress 这类逐帧进度事件，
+   * 只有 did-start-loading / did-stop-loading 两个端点。若只在这两点更新，
+   * 进度条就会一直停在起点（原实现的 bug）。
+   * 这里用「里程碑放开上限 + 时间渐进」来估算：
+   *   did-start-loading 起逐步推进，最多到 85%
+   *   dom-ready 后上限放开到 95%
+   *   did-stop-loading 时用一小段补满动画收到 100%
+   */
+  private progressTimer: NodeJS.Timeout | null = null
+  private progressStartedAt = 0
+  private progressMilestone: 'none' | 'dom' | 'loaded' = 'none'
+
+  constructor(private readonly emit: (channel: string, payload: unknown) => void) {}
 
   /** 绑定主窗口，窗口销毁时清理定时器 */
   attach(win: BrowserWindow) {
@@ -176,10 +192,21 @@ export class WebviewController {
     wc.setAudioMuted(false)
 
     // ---- 进度与导航事件 ----
-    wc.on('did-start-loading', () => this.patchState({ progress: 0, loading: true, error: null }))
+    wc.on('did-start-loading', () => {
+      this.startProgress()
+      this.patchState({ loading: true, error: null })
+    })
+
+    // 页面 DOM 就绪：放开进度上限（不强行跳到某个值，避免视觉上突然大跳）
+    wc.on('dom-ready', () => {
+      if (this.progressMilestone === 'none') {
+        this.progressMilestone = 'dom'
+      }
+    })
 
     wc.on('did-stop-loading', () => {
-      this.patchState({ progress: 1, loading: false })
+      void this.finishProgress()
+      this.patchState({ loading: false })
       void this.refreshFavoriteFlag()
     })
 
@@ -312,6 +339,59 @@ export class WebviewController {
     }
   }
 
+  /** 开始一次新的加载：重置进度并启动按时推进的定时器 */
+  private startProgress() {
+    this.stopProgress()
+    this.progressStartedAt = Date.now()
+    this.progressMilestone = 'none'
+    this.patchState({ progress: 0 })
+
+    // 每 60ms 推进一次，配合前端的线性过渡，视觉上是连续滑动
+    this.progressTimer = setInterval(() => {
+      const current = this.state?.progress ?? 0
+      // 各里程碑对应的上限：DOM 就绪前最多 85%，就绪后最多 95%，加载完成后才补满
+      const cap = this.progressMilestone === 'loaded' ? 0.99 : this.progressMilestone === 'dom' ? 0.95 : 0.85
+      if (current >= cap) return
+
+      const elapsed = (Date.now() - this.progressStartedAt) / 1000
+      // 指数逼近上限：起手快、收尾慢，符合真实加载的观感
+      const target = cap * (1 - Math.exp(-elapsed / 1.4))
+      const next = Math.min(cap, Math.max(current, target))
+      if (next - current >= 0.004) this.patchState({ progress: next })
+    }, 60)
+  }
+
+  /**
+   * 加载完成：先把进度补到 100% 再停止推送。
+   *
+   * 直接从 15% 跳到 100% 在缓存命中的快速加载里会显得很突兀，
+   * 这里保留一小段补满动画（最多 ~300ms），让进度条滑到终点再消失。
+   */
+  private async finishProgress() {
+    this.stopProgress()
+    this.progressMilestone = 'loaded'
+
+    const from = this.state?.progress ?? 0
+    if (from < 0.98) {
+      const steps = 5
+      for (let i = 1; i <= steps; i++) {
+        const next = from + (1 - from) * (i / steps)
+        this.patchState({ progress: Math.min(1, next) })
+        await new Promise((r) => setTimeout(r, 60))
+        // 期间若开始了新的加载则放弃补满
+        if (this.progressMilestone !== 'loaded') return
+      }
+    }
+    this.patchState({ progress: 1 })
+  }
+
+  private stopProgress() {
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer)
+      this.progressTimer = null
+    }
+  }
+
   /** 加载失败时统一转换成 UI 需要的错误信息 */
   private handleLoadError(e: unknown) {
     const message = e instanceof Error ? e.message : String(e)
@@ -326,7 +406,7 @@ export class WebviewController {
   }
 
   private pushState() {
-    if (this.state) this.emit('webview:state', this.state)
+    if (this.state) this.emit(IPC.eventWebviewState, this.state)
   }
 
   /** 查询当前地址是否已收藏，player 模式外一律视为未收藏 */
@@ -411,6 +491,7 @@ export class WebviewController {
     const view = this.view
     this.view = null
     this.stopPurifyTimer()
+    this.stopProgress()
     if (view) {
       try {
         if (this.win) this.win.contentView.removeChildView(view)
@@ -422,12 +503,13 @@ export class WebviewController {
     this.state = null
     this.visible = false
     if (this.win?.isFullScreen()) this.win.setFullScreen(false)
-    this.emit('webview:close', { reason: 'closed' })
+    this.emit(IPC.eventWebviewClose, { reason: 'closed' })
   }
 
   /** 应用退出时彻底释放 */
   destroy() {
     this.stopPurifyTimer()
+    this.stopProgress()
     if (this.view) {
       try {
         this.win?.contentView.removeChildView(this.view)

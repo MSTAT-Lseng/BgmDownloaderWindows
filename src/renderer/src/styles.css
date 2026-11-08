@@ -1245,7 +1245,17 @@ img {
 .progress-bar {
   height: 100%;
   background: var(--primary);
-  transition: width 0.2s ease;
+  /* 与主进程 120ms 的进度推送节奏匹配，让推进看起来是连续滑动而不是一格格跳 */
+  transition: width 0.14s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* 到达 100% 后向右淡出，避免进度条突然消失 */
+.progress-bar--done {
+  opacity: 0;
+  transition:
+    width 0.12s linear,
+    opacity 0.3s ease 0.1s;
 }
 
 /* 原生 WebContentsView 会浮在这个容器上方，这里只提供占位与错误遮罩 */

@@ -28,6 +28,8 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [state, setState] = useState<WebviewState | null>(null)
   const [progress, setProgress] = useState(0)
+  // 加载结束后让进度条多停留一小会儿，才能看到它补满并淡出
+  const [barVisible, setBarVisible] = useState(false)
 
   /** 把容器区域同步给主进程的原生视图 */
   const syncBounds = useCallback(() => {
@@ -59,14 +61,47 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
     }
   }, [url, type, userAgent, title])
 
-  // 订阅主进程推送的浏览器状态
+  // 订阅主进程推送的浏览器状态。
+  // 注意：页面切换会让本组件重新挂载，挂载期间可能已经错过若干次推送，
+  // 所以订阅后立刻再取一次当前状态，避免进度条停在旧值。
   useEffect(() => {
-    const off = getApi().on('webview:state', (next) => {
+    const api = getApi()
+    const off = api.on('webview:state', (next) => {
       setState(next)
-      setProgress(next.progress)
     })
+    void api.webview
+      .getState()
+      .then((current) => {
+        if (current) setState(current)
+      })
+      .catch(() => {})
     return off
   }, [])
+
+  // 进度始终从 state 派生，保证任何来源（open 结果 / 推送 / 主动查询）都能更新进度条
+  useEffect(() => {
+    if (state) setProgress(state.progress)
+  }, [state])
+
+  /**
+   * 进度条的显示时机。
+   *
+   * 关键：loading 变 false 时进度可能还停在 30% 左右（主进程随后才补满），
+   * 所以不能以 loading 作为隐藏依据，否则进度条会在补满动画开始前就消失。
+   * 正确做法是「只要还在加载，或进度尚未到 100%，就一直显示」。
+   */
+  useEffect(() => {
+    if (!state) return
+
+    if (state.loading || state.progress < 1) {
+      setBarVisible(true)
+      return
+    }
+
+    // 已到 100%：停留一小会儿让淡出动画走完再卸载
+    const timer = window.setTimeout(() => setBarVisible(false), 380)
+    return () => window.clearTimeout(timer)
+  }, [state])
 
   // 打开后主动同步一次收藏状态，保证星标一开始就是准确的
   useEffect(() => {
@@ -150,8 +185,6 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
     if (next) setState(next)
   }, [type, state, url, prompt])
 
-  const showProgress = state?.loading && progress < 1
-
   return (
     <div className="page webview-page">
       <div className="webview-toolbar">
@@ -198,9 +231,16 @@ export function WebviewScreen({ url, type, userAgent, title }: WebviewScreenProp
         ) : null}
       </div>
 
-      {showProgress ? (
+      {barVisible ? (
         <div className="progress-track">
-          <div className="progress-bar" style={{ width: `${Math.max(4, progress * 100)}%` }} />
+          {/*
+            宽度直接用估算出的进度值；固定最小值只在 0% 时给出可见的一小段，
+            不再用 Math.max(4, ...) 把进度钉死在 4%（那会让进度条永远停在同一个位置）。
+          */}
+          <div
+            className={`progress-bar${progress >= 1 ? ' progress-bar--done' : ''}`}
+            style={{ width: `${Math.min(100, Math.max(2, progress * 100))}%` }}
+          />
         </div>
       ) : null}
 
