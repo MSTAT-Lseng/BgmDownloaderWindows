@@ -15,7 +15,7 @@ import { favoritesDb } from './favorites-db'
 import { loadInjectedScript } from './resources'
 
 /** player 模式下允许从其他站点跳转的外部播放页白名单 */
-const PLAYER_URL_WHITELIST = ['xgct.com/video', 'xgcartoon.com/']
+const PLAYER_URL_WHITELIST = ['xgct.com/video', 'xgcartoon.com/', 'anime7.top']
 
 /** 默认 UA：声明为 Windows 桌面 Chrome，符合这是桌面版的事实 */
 const DEFAULT_USER_AGENT = ''
