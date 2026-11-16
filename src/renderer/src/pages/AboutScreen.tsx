@@ -25,12 +25,14 @@ export function AboutScreen() {
       .catch((err) => console.error("Couldn't load page", err))
   }
 
-  /** 手动检查更新：先提示，再交给主进程弹窗 */
+  /** 手动检查更新：主进程在 display=true 时会弹窗，这里只负责“无更新/失败”的 toast 提示 */
   const checkUpdateHandler = async () => {
     show('检查更新中...')
     try {
-      const result = await getApi().checkUpdate()
-      if (!result.hasUpdate) show('已经是最新版本')
+      const result = await getApi().checkUpdate(true)
+      if (result.hasUpdate) return
+      if (result.error) show(`检查更新失败：${result.error}`)
+      else show(`已经是最新版本${result.current ? `（${result.current}）` : ''}`)
     } catch {
       show('检查更新失败')
     }

@@ -61,7 +61,7 @@ const api: RendererApi = {
 
   alert: (options) => ipcRenderer.invoke(IPC.alert, options),
 
-  checkUpdate: () => ipcRenderer.invoke(IPC.checkUpdate, true),
+  checkUpdate: (display = true) => ipcRenderer.invoke(IPC.checkUpdate, display),
 
   on: (channel, listener) => {
     const ipcChannel = EVENT_CHANNELS[channel]

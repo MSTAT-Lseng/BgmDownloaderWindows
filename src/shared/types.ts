@@ -157,8 +157,16 @@ export interface RendererApi {
   /** 系统原生提示框 */
   alert(options: { title: string; message?: string; detail?: string; type?: 'info' | 'warning' | 'error' }): Promise<void>
 
-  /** 检查更新 */
-  checkUpdate(): Promise<{ hasUpdate: boolean; latest?: string; log?: string; url?: string; force?: boolean }>
+  /** 检查更新：display 为 true 时由主进程弹窗；error 表示检查失败原因 */
+  checkUpdate(display?: boolean): Promise<{
+    hasUpdate: boolean
+    current?: string
+    latest?: string
+    log?: string
+    url?: string
+    force?: boolean
+    error?: string
+  }>
 
   /** 订阅主进程推送事件，返回取消订阅函数 */
   on<K extends keyof RendererEvents>(channel: K, listener: (payload: RendererEvents[K]) => void): () => void

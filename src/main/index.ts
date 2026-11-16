@@ -219,9 +219,22 @@ function registerIpc() {
     }
   )
 
+  // display=true 表示手动检查：有新版本直接弹窗，失败时也弹窗告知；启动静默检查不弹窗
   ipcMain.handle(IPC.checkUpdate, async (_e, display?: boolean) => {
     const result = await checkUpdate(false)
-    if (result.hasUpdate && display) await showUpdateDialog(result)
+    if (display) {
+      if (result.hasUpdate) await showUpdateDialog(result)
+      else if (result.error) {
+        await dialog.showMessageBox({
+          type: 'warning',
+          title: '检查更新失败',
+          message: '检查更新失败',
+          detail: `请检查网络连接后重试。\n\n${result.error}`,
+          buttons: ['确定'],
+          noLink: true
+        })
+      }
+    }
     return result
   })
 }
